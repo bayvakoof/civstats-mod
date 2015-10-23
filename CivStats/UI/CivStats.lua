@@ -20,7 +20,14 @@ function SaveCivStats()
 		bStatsSavePolicies = false;
 	end
 end
-Events.ActivePlayerTurnStart.Add( SaveCivStats );
+Events.ActivePlayerTurnStart.Add( SaveCivStats ); 
+
+function ClearCivStats()
+	Modding.DeleteUserData("civstats-demos", 1);
+	Modding.DeleteUserData("civstats-religion", 1);
+	Modding.DeleteUserData("civstats-policies", 1);
+end
+Events.LoadScreenClose.Add( ClearCivStats );
 
 function HandlePopupProcessed(popupInfoType)
 	-- policies
