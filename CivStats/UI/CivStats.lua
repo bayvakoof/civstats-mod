@@ -2,8 +2,6 @@
 -- CivStats
 -------------------------------------------------
 
-include( "Demographics" );
-
 local bStatsSaveReligion = false;
 local bStatsSavePolicies = false;
 
@@ -45,22 +43,22 @@ Events.SerialEventGameMessagePopupProcessed.Add(HandlePopupProcessed);
 function SaveDemographics()
 	local iPlayer = Game.GetActivePlayer();
 
-	modUserData = Modding.OpenUserData("civstats-demos", 1); 
-	modUserData.SetValue("turn", Game.GetGameTurn());
+	local demosUserData = Modding.OpenUserData("civstats-demos", 1); 
+	demosUserData.SetValue("turn", Game.GetGameTurn());
 
 	-- demographics
-	modUserData.SetValue("population", GetPopulationValue(iPlayer));
-	modUserData.SetValue("food", GetFoodValue(iPlayer));
-	modUserData.SetValue("production", GetProductionValue(iPlayer));
-	modUserData.SetValue("gold", GetGoldValue(iPlayer));
-	modUserData.SetValue("land", GetLandValue(iPlayer));
-	modUserData.SetValue("military", GetArmyValue(iPlayer));
-	modUserData.SetValue("approval", GetApprovalValue(iPlayer));
-	modUserData.SetValue("literacy", GetLiteracyValue(iPlayer));
+	demosUserData.SetValue("population", GetPopulationValue(iPlayer));
+	demosUserData.SetValue("food", GetFoodValue(iPlayer));
+	demosUserData.SetValue("production", GetProductionValue(iPlayer));
+	demosUserData.SetValue("gold", GetGoldValue(iPlayer));
+	demosUserData.SetValue("land", GetLandValue(iPlayer));
+	demosUserData.SetValue("military", GetArmyValue(iPlayer));
+	demosUserData.SetValue("approval", GetApprovalValue(iPlayer));
+	demosUserData.SetValue("literacy", GetLiteracyValue(iPlayer));
 end
 
 function SaveReligion()
-	modUserData = Modding.OpenUserData("civstats-religion", 1); 
+	local religUserData = Modding.OpenUserData("civstats-religion", 1); 
 	local player = Players[Game.GetActivePlayer()];
 
 	if (player:HasCreatedReligion()) then
@@ -69,15 +67,15 @@ function SaveReligion()
 			local belief = GameInfo.Beliefs[v];
 			if(belief ~= nil) then
 				local beliefType = string.lower(GetBeliefType(belief));
-				modUserData.SetValue(i, Locale.Lookup(belief.ShortDescription));
-				modUserData.SetValue(i .. "-type", beliefType);
+				religUserData.SetValue(i, Locale.Lookup(belief.ShortDescription));
+				religUserData.SetValue(i .. "-type", beliefType);
 			end
 		end
 	elseif (player:HasCreatedPantheon()) then
 		local pantheonId = player:GetBeliefInPantheon();						
 		local belief = GameInfo.Beliefs[pantheonId];
-		modUserData.SetValue("1", Locale.Lookup(belief.ShortDescription));
-		modUserData.SetValue("1-type", "pantheon");
+		religUserData.SetValue("1", Locale.Lookup(belief.ShortDescription));
+		religUserData.SetValue("1-type", "pantheon");
 	end
 end
 
@@ -98,7 +96,13 @@ end
 function SavePolicies()
 	local player = Players[Game.GetActivePlayer()];
 
-	local policiesTable = {}
+	local policiesTable = {};
+
+	-- reset ideologies (changing ideologies is destructive)
+	ideologies = { 'Freedom', 'Autocracy', 'Order' };
+	for i, ideology in ipairs(ideologies) do
+		polUserData.SetValue(ideology, nil);
+	end
 	
 	i = 0;
 	local policyInfo = GameInfo.Policies[i];
@@ -124,8 +128,10 @@ function SavePolicies()
 		policyInfo = GameInfo.Policies[i];
 	end
 
-	modUserData = Modding.OpenUserData("civstats-policies", 1); 
+	local polUserData = Modding.OpenUserData("civstats-policies", 1); 
+	polUserData.SetValue("turn", Game.GetGameTurn());
+	
 	for k,v in pairs(policiesTable) do
-		modUserData.SetValue(k, v);
+		polUserData.SetValue(k, v);
 	end
 end

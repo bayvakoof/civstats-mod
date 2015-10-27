@@ -3,7 +3,7 @@
   <GUID>{996C71D9-5F41-470C-984E-06433713682C}</GUID>
 	<SteamApp>235580</SteamApp>
   <Version>1</Version>
-  <Priority>400</Priority>
+  <Priority>100</Priority>
   <Key>bf6d34a0074b7ad4b1d1716475f7f7fe</Key>
   <PTags>
 	  <Tag>Version</Tag>
