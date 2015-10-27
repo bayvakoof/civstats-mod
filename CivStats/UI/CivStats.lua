@@ -3,7 +3,6 @@
 -------------------------------------------------
 
 local bStatsSaveReligion = false;
-local bStatsSavePolicies = false;
 
 function SaveCivStats()
 	SaveDemographics();
@@ -11,11 +10,6 @@ function SaveCivStats()
 	if (bStatsSaveReligion) then
 		SaveReligion();
 		bStatsSaveReligion = false;
-	end
-
-	if (bStatsSavePolicies) then
-		SavePolicies();
-		bStatsSavePolicies = false;
 	end
 end
 Events.ActivePlayerTurnStart.Add( SaveCivStats ); 
@@ -28,12 +22,7 @@ end
 Events.LoadScreenClose.Add( ClearCivStats );
 
 function HandlePopupProcessed(popupInfoType)
-	-- policies
-	if (popupInfoType == ButtonPopupTypes.BUTTONPOPUP_CHOOSEPOLICY) then
-		bStatsSavePolicies = true;
-	end
-
-	-- religion
+	-- religion - covers pantheon/reformation/enhancing (updates at start of next turn)
 	if (popupInfoType == ButtonPopupTypes.BUTTONPOPUP_FOUND_PANTHEON or popupInfoType == ButtonPopupTypes.BUTTONPOPUP_FOUND_RELIGION) then
 		bStatsSaveReligion = true;
 	end
@@ -79,6 +68,16 @@ function SaveReligion()
 	end
 end
 
+-- religion - immediate update upon founding religion
+GameEvents.CityConvertsReligion.Add(function(iOwner, eReligion, iX, iY)
+	local city = Game.GetHolyCityForReligion(eReligion, -1);
+	local bConvertedCityIsHoly = (city:GetX() == iX and city:GetY() == iY);
+	-- check if city is owned by current player and it is the holy city for relig
+	if (iOwner == Game.GetActivePlayer() and bConvertedCityIsHoly) then
+		SaveReligion();
+	end
+end)
+
 function GetBeliefType(belief)
 	if(belief.Pantheon) then
 		return Locale.Lookup("TXT_KEY_RO_BELIEF_TYPE_PANTHEON");
@@ -97,12 +96,6 @@ function SavePolicies()
 	local player = Players[Game.GetActivePlayer()];
 
 	local policiesTable = {};
-
-	-- reset ideologies (changing ideologies is destructive)
-	ideologies = { 'Freedom', 'Autocracy', 'Order' };
-	for i, ideology in ipairs(ideologies) do
-		polUserData.SetValue(ideology, nil);
-	end
 	
 	i = 0;
 	local policyInfo = GameInfo.Policies[i];
@@ -131,7 +124,14 @@ function SavePolicies()
 	local polUserData = Modding.OpenUserData("civstats-policies", 1); 
 	polUserData.SetValue("turn", Game.GetGameTurn());
 	
+	-- reset ideologies (changing ideologies is destructive)
+	ideologies = { 'Freedom', 'Autocracy', 'Order' };
+	for i, ideology in ipairs(ideologies) do
+		polUserData.SetValue(ideology, nil);
+	end
+	
 	for k,v in pairs(policiesTable) do
 		polUserData.SetValue(k, v);
 	end
 end
+Events.EventPoliciesDirty.Add(SavePolicies);
