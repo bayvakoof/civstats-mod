@@ -2,32 +2,54 @@
 -- CivStats
 -------------------------------------------------
 
+print("Included CivStats.lua");
+
 local bStatsSaveReligion = false;
 
-function SaveCivStats()
+function AddCivStatsEvents()
+	print("Adding CivStats event handlers");
+	
+	-- clear all dbs when loading a game
+	Events.LoadScreenClose.Add( ClearCivStats );
+	
+	-- demographics/religion
+	Events.ActivePlayerTurnStart.Add( SaveCivStatsEachTurn ); 
+	Events.SerialEventGameMessagePopupProcessed.Add(CivStatsHandlePopupProcessed);
+	GameEvents.CityConvertsReligion.Add( CivStatsHandleCityConvert );
+	
+	-- policies
+	Events.EventPoliciesDirty.Add( SavePolicies );
+	
+	-- wonders, multiplayer only, doesn't include conquered city wonders
+	Events.NotificationAdded.Add( CivStatsHandleNotification )
+end
+
+function SaveCivStatsEachTurn()
 	SaveDemographics();
 
+	-- there's another event that's used to catch founding a religion,
+	-- but this is still needed here to handle pantheon/enhancing/reformation
 	if (bStatsSaveReligion) then
 		SaveReligion();
 		bStatsSaveReligion = false;
 	end
 end
-Events.ActivePlayerTurnStart.Add( SaveCivStats ); 
 
 function ClearCivStats()
+	print("Loading screen close")
 	Modding.DeleteUserData("civstats-demos", 1);
 	Modding.DeleteUserData("civstats-religion", 1);
 	Modding.DeleteUserData("civstats-policies", 1);
+	Modding.DeleteUserData("civstats-wonders", 1);
 end
-Events.LoadScreenClose.Add( ClearCivStats );
 
-function HandlePopupProcessed(popupInfoType)
-	-- religion - covers pantheon/reformation/enhancing (updates at start of next turn)
+function CivStatsHandlePopupProcessed(popupInfoType)
+	-- ButtonPopupTypes.BUTTONPOPUP_FOUND_PANTHEON: pantheon/reformation
+	-- ButtonPopupTypes.BUTTONPOPUP_FOUND_RELIGION: founding/enhancing
 	if (popupInfoType == ButtonPopupTypes.BUTTONPOPUP_FOUND_PANTHEON or popupInfoType == ButtonPopupTypes.BUTTONPOPUP_FOUND_RELIGION) then
 		bStatsSaveReligion = true;
 	end
 end
-Events.SerialEventGameMessagePopupProcessed.Add(HandlePopupProcessed);
 
 function SaveDemographics()
 	local iPlayer = Game.GetActivePlayer();
@@ -68,15 +90,15 @@ function SaveReligion()
 	end
 end
 
--- religion - immediate update upon founding religion
-GameEvents.CityConvertsReligion.Add(function(iOwner, eReligion, iX, iY)
+-- religion - event fired immediately upon founding religion
+function CivStatsHandleCityConvert(iOwner, eReligion, iX, iY)
 	local city = Game.GetHolyCityForReligion(eReligion, -1);
 	local bConvertedCityIsHoly = (city:GetX() == iX and city:GetY() == iY);
 	-- check if city is owned by current player and it is the holy city for relig
 	if (iOwner == Game.GetActivePlayer() and bConvertedCityIsHoly) then
 		SaveReligion();
 	end
-end)
+end
 
 function GetBeliefType(belief)
 	if(belief.Pantheon) then
@@ -134,4 +156,21 @@ function SavePolicies()
 		polUserData.SetValue(k, v);
 	end
 end
-Events.EventPoliciesDirty.Add(SavePolicies);
+
+function CivStatsHandleNotification(notificationId, notificationType, toolTip, summary, gameValue, extraGameData)
+	if (notificationType == NotificationTypes.NOTIFICATION_WONDER_COMPLETED_ACTIVE_PLAYER) then
+		local wonder = Locale.Lookup(GameInfo.Buildings[gameValue].Description);
+		wonderUserData = Modding.OpenUserData("civstats-wonders", 1);
+		wonderUserData.SetValue(wonder, Game.GetGameTurn());
+		
+		-- TODO: single player, gaining/losing wonders (i.e. enemy player conquers your city)
+	end
+end
+
+-- Since Demographics.lua is Included in EndGameDemographics.lua too, check
+-- if the context is EndGameDemographics and don't add event listeners in that case.
+-- ( otherwise they're added twice, once with Include("Demographics") and once with 
+-- Include("EndGameDemographics") )
+if (ContextPtr:GetID() == "Demographics") then
+	AddCivStatsEvents();
+end
