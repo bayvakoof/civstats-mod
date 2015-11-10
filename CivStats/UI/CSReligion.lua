@@ -10,17 +10,24 @@ function SetupReligionSaving()
 	GameEvents.CityConvertsReligion.Add( HandleCityReligiousConversion )
 	
 	-- fired when user launches choose pantheon/reformation/religion popups
-	Events.SerialEventGameMessagePopupProcessed.Add( HandlePopupProcessed )
+	Events.NotificationAdded.Add( HandleReligiousNotification )
 end
 
-local function HandlePopupProcessed(popupInfoType)
-	-- ButtonPopupTypes.BUTTONPOPUP_FOUND_PANTHEON: pantheon/reformation
-	-- ButtonPopupTypes.BUTTONPOPUP_FOUND_RELIGION: founding/enhancing (required to detect enhancing)
-	if (popupInfoType == ButtonPopupTypes.BUTTONPOPUP_FOUND_PANTHEON or popupInfoType == ButtonPopupTypes.BUTTONPOPUP_FOUND_RELIGION) then
-		bSaveReligion = true
-		
-		-- TODO, implement this
+function HandleReligiousNotification(notificationId, notificationType, toolTip, summary, gameValue, extraGameData)
+	if (IsReligiousNotification(notificationType)) then
+		SaveReligionData()
 	end
+end
+
+local relNotificationTable = { 
+	[NotificationTypes.NOTIFICATION_PANTHEON_FOUNDED_ACTIVE_PLAYER] = true,
+	[NotificationTypes.NOTIFICATION_RELIGION_ENHANCED_ACTIVE_PLAYER] = true,
+	[NotificationTypes.NOTIFICATION_REFORMATION_BELIEF_ADDED_ACTIVE_PLAYER]= true }
+function IsReligiousNotification(type)
+	if relNotificationTable[type] == nil then
+		return false
+	end
+	return true
 end
 
 function HandleCityReligiousConversion(iOwner, eReligion, iX, iY)
@@ -53,7 +60,7 @@ function SaveReligionData()
 	end
 end
 
-local function GetBeliefType(belief)
+function GetBeliefType(belief)
 	if(belief.Pantheon) then
 		return Locale.Lookup("TXT_KEY_RO_BELIEF_TYPE_PANTHEON")
 	elseif(belief.Founder) then

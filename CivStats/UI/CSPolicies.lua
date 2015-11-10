@@ -6,15 +6,15 @@ local polUserData = Modding.OpenUserData("civstats-policies", 1)
 local currentIdeology = nil
 
 function SetupPolicyChoiceSaving()    
-	GameEvents.PlayerAdoptPolicy.Add( HandlePolicyChoice )
+	GameEvents.PlayerAdoptPolicy.Add( HandlePlayerPolicyChoice )
 end
 
 function HandlePlayerPolicyChoice(playerID, policyTypeID)
 	local policyInfo = GameInfo.Policies[policyTypeID];
-	local branch = GetBranch(policyInfo)
-	
+
 	SavePolicyData(policyInfo, Game.GetGameTurn())
-	
+
+	local branch = GetBranch(policyInfo)
 	if IsIdeologicalBranch(branch) then
 		if currentIdeology == nil then
 			currentIdeology = branch
