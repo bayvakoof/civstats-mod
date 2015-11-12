@@ -7,9 +7,14 @@ local currentIdeology = nil
 
 function SetupPolicyChoiceSaving()    
 	GameEvents.PlayerAdoptPolicy.Add( HandlePlayerPolicyChoice )
+	GameEvents.PlayerAdoptPolicyBranch.Add( HandlePlayerBranchChoice )
 end
 
 function HandlePlayerPolicyChoice(playerID, policyTypeID)
+	if (playerID ~= Game.GetActivePlayer()) then
+		return
+	end
+
 	local policyInfo = GameInfo.Policies[policyTypeID];
 
 	SavePolicyData(policyInfo, Game.GetGameTurn())
@@ -23,6 +28,28 @@ function HandlePlayerPolicyChoice(playerID, policyTypeID)
 			ClearPolicyDataForBranch(currentIdeology)
 			currentIdeology = branch
 		end
+	end
+end
+
+function HandlePlayerBranchChoice(playerID, policyBranchTypeID)
+	if (playerID ~= Game.GetActivePlayer()) then
+		return
+	end
+	
+	local chosenBranch = Locale.Lookup(GameInfo.PolicyBranchTypes[policyBranchTypeID].Description)
+
+	local i = 0
+	local policyInfo = GameInfo.Policies[0]
+	while policyInfo ~= nil do
+		if (policyInfo.PolicyBranchType == nil) then -- is opener
+			if (chosenBranch == GetBranch(policyInfo)) then
+				SavePolicyData(policyInfo, Game.GetGameTurn())
+				return
+			end
+		end
+
+		policyInfo = GameInfo.Policies[i]
+		i = i + 1
 	end
 end
 
