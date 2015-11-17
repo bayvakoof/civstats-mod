@@ -8,6 +8,9 @@ local currentIdeology = nil
 function SetupPolicyChoiceSaving()    
 	GameEvents.PlayerAdoptPolicy.Add( HandlePlayerPolicyChoice )
 	GameEvents.PlayerAdoptPolicyBranch.Add( HandlePlayerBranchChoice )
+
+	-- write current policy choices immediately (in case of reload / loading a save)
+	SaveAllPolicyData()
 end
 
 function HandlePlayerPolicyChoice(playerID, policyTypeID)

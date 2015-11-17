@@ -11,6 +11,10 @@ function SetupReligionSaving()
 	
 	-- fired when user launches choose pantheon/reformation/religion popups
 	Events.NotificationAdded.Add( HandleReligiousNotification )
+	
+	-- in case this is a game loaded from a save or a reload, immediately write 
+	-- current religion data
+	SaveReligionData()
 end
 
 function HandleReligiousNotification(notificationId, notificationType, toolTip, summary, gameValue, extraGameData)

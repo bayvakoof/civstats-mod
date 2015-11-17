@@ -18,6 +18,7 @@ function InitCivStats()
 	SetupDemographicsSaving()
 	SetupPolicyChoiceSaving()
 	SetupReligionSaving()
+	SetupWonderSaving()
 end
 
 
