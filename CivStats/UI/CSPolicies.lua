@@ -56,6 +56,9 @@ function HandlePlayerBranchChoice(playerID, policyBranchTypeID)
 	end
 end
 
+-- FIXME this only works for one language (english)
+-- i.e. if Locale.Lookup(TXT_KEY_BRANCH_AUTOCRACY ... whatever) returns nonenglish this wont work
+-- TODO replace with TXT_KEYs or something idk
 function IsIdeologicalBranch(branch)
 	local t = { Autocracy = true, Freedom = true, Order = true }
 	if t[branch] == nil then
@@ -113,6 +116,10 @@ function SaveAllPolicyData()
 		if player:HasPolicy( i ) then
 			-- turn 0 to indicate player had policy at game start
 			SavePolicyData(policyInfo, 0)
+
+			if IsIdeologicalBranch(GetBranch(policyInfo)) then
+				currentIdeology = branch
+			end
 		end
 
 		i = i + 1
