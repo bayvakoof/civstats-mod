@@ -5,13 +5,14 @@
 local wonderUserData = Modding.OpenUserData("civstats-wonders", 1)
 
 function SetupWonderSaving()   
-	-- singleplayer only
+	-- singleplayer (also triggered when user clicks on notification in multiplayer)
 	Events.SerialEventGameMessagePopupShown.Add( HandleWonderPopup )
  
 	-- multiplayer only
 	Events.NotificationAdded.Add( HandleWonderNotification )
 
-	Events.SerialEventCityCaptured.Add( HandleCityChange )
+	-- cities changing hands
+	GameEvents.CityCaptureComplete.Add( HandleCityChange )
 	Events.SerialEventCityDestroyed.Add( HandleCityDestroyed )
 
 	-- write current wonders immediately (in case of reload / loading a save)
@@ -79,20 +80,15 @@ function HandleWonderNotification(notificationId, notificationType, toolTip, sum
 end
 
 function HandleWonderPopup(popupInfo)
-	print("Popup got!")
 	if popupInfo.Type ~= ButtonPopupTypes.BUTTONPOPUP_WONDER_COMPLETED_ACTIVE_PLAYER then
 		return
 	end
-
-	print("Popup is wonder popup!")
 	
 	local buildingID = popupInfo.Data1
 	local building = GameInfo.Buildings[ buildingID ]
 	if building == nil then
     		return
 	end
-
-	print("Wonder is ".. building.Description)
 
 	SaveWonder(buildingID, false)
 end
@@ -113,23 +109,23 @@ function BuildingIsWonder(buildingID)
 	return isWorldWonder
 end
 
-function HandleCityChange(hexPos, playerID, cityID, newPlayerID) 
-	local isLoser = Game.GetActivePlayer() == playerID
-	local isWinner = Game.GetActivePlayer() == newPlayerID
+function HandleCityChange(iOldOwner, bIsCapital, iX, iY, iNewOwner, iPop, bConquest)
+	local isLoser = Game.GetActivePlayer() == iOldOwner
+	local isWinner = Game.GetActivePlayer() == iNewOwner
 
 	if not (isLoser or isWinner) then
 		return
 	end
 
-	local player = Players[Game.GetActivePlayer()]
-	local city = player:GetCityByID(cityID)
+	local plot = Map.GetPlot(iX, iY)
+	local city = plot:GetPlotCity()
 
 	if isLoser then
 		DeleteWondersInCity(city)
 	end
 
 	if isWinner then
-		SaveWondersInCity(player:GetCityByID(cityID), true)
+		SaveWondersInCity(city, bConquest)
 	end
 end
 
