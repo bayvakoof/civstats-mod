@@ -4,9 +4,11 @@
 
 include ("MapUtilities")
 
-local gameUserData = Modding.OpenUserData("civstats-game", 1)
+local gameUserData = nil
 
-function SetupGameInfoSaving()    
+function SetupGameInfoSaving()  
+	Modding.DeleteUserData("civstats-game", 1)
+	gameUserData = Modding.OpenUserData("civstats-game", 1)  
 	Events.LoadScreenClose.Add( SaveGameInfo ); 
 end
 

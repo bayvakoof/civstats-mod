@@ -2,10 +2,13 @@
 -- CIV STATS POLICIES
 --------------------------------------------------------------------------------
 
-local polUserData = Modding.OpenUserData("civstats-policies", 1)
+local polUserData = nil
 local currentIdeology = nil
 
 function SetupPolicyChoiceSaving()    
+	Modding.DeleteUserData("civstats-policies", 1)
+	polUserData = Modding.OpenUserData("civstats-policies", 1)
+
 	GameEvents.PlayerAdoptPolicy.Add( HandlePlayerPolicyChoice )
 	GameEvents.PlayerAdoptPolicyBranch.Add( HandlePlayerBranchChoice )
 

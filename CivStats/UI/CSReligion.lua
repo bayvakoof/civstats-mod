@@ -2,10 +2,12 @@
 -- CIV STATS RELIGION
 --------------------------------------------------------------------------------
 
-local religUserData = Modding.OpenUserData("civstats-religion", 1)
-local bSaveReligion = false
+local religUserData = nil
 
 function SetupReligionSaving()
+	Modding.DeleteUserData("civstats-religion", 1)
+	religUserData = Modding.OpenUserData("civstats-religion", 1)
+
 	-- immediately fired after founding a religion
 	GameEvents.CityConvertsReligion.Add( HandleCityReligiousConversion )
 	

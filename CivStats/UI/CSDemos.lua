@@ -2,7 +2,7 @@
 -- CIV STATS DEMOGRAPHICS
 --------------------------------------------------------------------------------
 
-local demosUserData = Modding.OpenUserData("civstats-demos", 1)
+local demosUserData = nil
 	
 local populationTable = {}
 local foodTable = {}
@@ -14,6 +14,8 @@ local approvalTable = {}
 local literacyTable = {}
 
 function SetupDemographicsSaving()
+	Modding.DeleteUserData("civstats-demos", 1)
+	demosUserData = Modding.OpenUserData("civstats-demos", 1)
 	Events.ActivePlayerTurnEnd.Add( SaveDemographicsData )
 end
 

@@ -2,9 +2,12 @@
 -- CIV STATS WONDERS
 --------------------------------------------------------------------------------
 
-local wonderUserData = Modding.OpenUserData("civstats-wonders", 1)
+local wonderUserData = nil
 
 function SetupWonderSaving()   
+	Modding.DeleteUserData("civstats-wonders", 1)
+	wonderUserData = Modding.OpenUserData("civstats-wonders", 1)
+
 	-- singleplayer (also triggered when user clicks on notification in multiplayer)
 	Events.SerialEventGameMessagePopupShown.Add( HandleWonderPopup )
  
