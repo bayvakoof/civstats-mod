@@ -12,18 +12,21 @@ function SetupWarSaving()
 end
 
 function SaveWarStart(otherPlayer, aggressor)
-	local otherCiv = GameInfo.Civilizations[otherPlayer:GetCivilizationType()].ShortDescription
+	local otherCivName = GameInfo.Civilizations[otherPlayer:GetCivilizationType()].ShortDescription
+	local turn = Game.GetGameTurn()
+	-- use <civilization>-<turn>-war format as identifier in db
+	-- this is fine because multiple war decs cannot be made with one civ in a turn
+	local id = otherCivName .. "-" .. turn
 
-	warUserData.SetValue("turn", Game.GetGameTurn())
-	warUserData.SetValue("civilization", otherCiv)
-	warUserData.SetValue("aggressor", aggressor) -- whether active player initiated the war
+	warUserData.SetValue(id .. "-war", aggressor)
 end
 
 function SaveWarEnd(otherPlayer)
-	local otherCiv = GameInfo.Civilizations[otherPlayer:GetCivilizationType()].ShortDescription
+	local otherCivName = GameInfo.Civilizations[otherPlayer:GetCivilizationType()].ShortDescription
+	local turn = Game.GetGameTurn()
+	local id = otherCivName .. "-" .. turn
 
-	warUserData.SetValue("turn", Game.GetGameTurn())
-	warUserData.SetValue("civilization", otherCiv)
+	warUserData.SetValue(id .. "-peace", "")
 end
 
 function WarStateHandler( iTeam1, iTeam2, bWar )
