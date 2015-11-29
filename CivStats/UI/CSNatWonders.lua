@@ -22,11 +22,11 @@ function SetupNaturalWonderSaving()
 	SaveAllPlayerNaturalWonders()
 end
 
-function SaveNaturalWondersInCity(city, conquered)
+function SaveNaturalWondersInCity(city)
 	for i = 0, city:GetNumCityPlots() - 1, 1 do
 		local plot = city:GetCityIndexPlot( i );
 		if plot ~= nil and FeatureIsWonder(plot:GetFeatureType()) then
-			SaveNaturalWonder(plot:GetFeatureType(), city, conquered)
+			SaveNaturalWonder(plot:GetFeatureType(), city)
 		end
 	end
 end
@@ -40,7 +40,7 @@ function DeleteNaturalWondersInCity(city)
 	end
 end
 
-function SaveNaturalWonder(featureId, city, conquered)
+function SaveNaturalWonder(featureId, city)
 	naturalUserData.SetValue(featureId, true)
 	local name = Locale.ConvertTextKey(GameInfo.Features[featureId].Description);
 	naturalUserData.SetValue(featureId .. "-name", name)
@@ -49,8 +49,6 @@ function SaveNaturalWonder(featureId, city, conquered)
 	if city ~= nil then
 		naturalUserData.SetValue(featureId .. "-city", city:GetName())
 	end
-
-	naturalUserData.SetValue(featureId .. "-conquered", conquered)
 end
 
 function DeleteNaturalWonder(featureId)
@@ -62,7 +60,7 @@ end
 function SaveAllPlayerNaturalWonders()
 	local player = Players[Game.GetActivePlayer()]
 	for city in player:Cities() do
-		SaveNaturalWondersInCity(city, false) -- unfortunately, assume all wonders were hard built
+		SaveNaturalWondersInCity(city)
 	end
 end
 
@@ -76,7 +74,7 @@ function HandleBorderExpansion(hexX, hexY, playerID, isUnknown)
 	if plot and FeatureIsWonder(plot:GetFeatureType()) then
 		-- Save the natural wonder
 		local city = plot:GetWorkingCity() -- doesnt work correctly for plots outside city working radius
-		SaveNaturalWonder(plot:GetFeatureType(), city, false)
+		SaveNaturalWonder(plot:GetFeatureType(), city)
 	end
 end
 
@@ -99,7 +97,7 @@ function HandleCityChange(iOldOwner, bIsCapital, iX, iY, iNewOwner, iPop, bConqu
 	local plot = Map.GetPlot(iX, iY)
 	local city = plot:GetPlotCity()
 
-	DeleteWondersInCity(city)
+	DeleteNaturalWondersInCity(city)
 end
 
 function HandleCityBordersLost(hexPos, playerID, cityID, newPlayer) 

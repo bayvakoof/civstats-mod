@@ -13,6 +13,7 @@ function InitCivStats()
 	SetupReligionSaving()
 	SetupWonderSaving()
 	SetupNaturalWonderSaving()
+	SetupWarSaving()
 end
 
 -- Check civstats isn't loaded multiple times in different scopes
