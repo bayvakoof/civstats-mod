@@ -17,7 +17,21 @@ function SaveGameInfo()
 	gameUserData.SetValue("speed", GetGameSpeed())
 	gameUserData.SetValue("map", GetMapName())
 	gameUserData.SetValue("size", GetMapSize())
-	gameUserData.SetValue("civilization", GetCivilizationName())
+	gameUserData.SetValue("civilization", GetCivilizationName(Game.GetActivePlayer()))
+
+	SavePlayerInfo()
+end
+
+function SavePlayerInfo()
+	local iActivePlayer = Game.GetActivePlayer()
+
+	for iPlayerLoop = 0, GameDefines.MAX_MAJOR_CIVS-1, 1 do
+		if iPlayerLoop ~= iActivePlayer then
+			pOtherPlayer = Players[iPlayerLoop];
+			gameUserData.SetValue(iPlayerLoop .. "-name", pOtherPlayer:GetName())
+			gameUserData.SetValue(iPlayerLoop .. "-civ", GetCivilizationName(iPlayerLoop))
+		end
+	end
 end
 
 function GetGameDifficulty()
@@ -41,8 +55,8 @@ function GetMapSize()
 	return Locale.ConvertTextKey(worldInfo.Description)
 end
 
-function GetCivilizationName()
-	local player = Players[Game.GetActivePlayer()]
+function GetCivilizationName(iPlayer)
+	local player = Players[iPlayer]
 	local name = GameInfo.Civilizations[player:GetCivilizationType()].ShortDescription
 	return Locale.ConvertTextKey(name)
 end

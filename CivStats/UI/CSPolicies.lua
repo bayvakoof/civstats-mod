@@ -134,6 +134,25 @@ function SavePolicyData(policyInfo, turn)
 	local id = policyInfo.ID
 	polUserData.SetValue(id, true)
 	polUserData.SetValue(id .. "-branch", GetBranch(policyInfo))
-	polUserData.SetValue(policyInfo.ID .. "-name", GetPolicyName(policyInfo))
-	polUserData.SetValue(policyInfo.ID .. "-turn", turn) 
+	polUserData.SetValue(id .. "-name", GetPolicyName(policyInfo))
+	polUserData.SetValue(id .. "-turn", turn) 
+
+	local cost = 0
+	if turn ~= 0 then
+		cost = CalculateLastPolicyCost()
+	end
+	polUserData.SetValue(id .. "-cost", cost)
+end
+
+-- TODO Confirm this works
+-- http://civilization.wikia.com/wiki/Mathematics_of_Civilization_V
+function CalculateLastPolicyCost()
+	local player = Players[Game.GetActivePlayer()]
+	local nextCost = player:GetNextPolicyCost()
+	local numPolicies = player:GetNumPolicies()
+
+	local lastCost = nextCost * ( (25 + 6 * (numPolicies - 1) ^ 1.7) / 
+		(25 + 6 * numPolicies ^ 1.7) )
+	print("Last culture cost: " .. lastCost)
+	return lastCost
 end

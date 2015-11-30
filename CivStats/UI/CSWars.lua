@@ -12,7 +12,7 @@ function SetupWarSaving()
 end
 
 function SaveWarStart(otherPlayer, aggressor)
-	local otherCivName = GameInfo.Civilizations[otherPlayer:GetCivilizationType()].ShortDescription
+	local otherCivName = GetPlayerCivilizationName(otherPlayer)
 	local turn = Game.GetGameTurn()
 	-- use <civilization>-<turn>-war format as identifier in db
 	-- this is fine because multiple war decs cannot be made with one civ in a turn
@@ -22,7 +22,7 @@ function SaveWarStart(otherPlayer, aggressor)
 end
 
 function SaveWarEnd(otherPlayer)
-	local otherCivName = GameInfo.Civilizations[otherPlayer:GetCivilizationType()].ShortDescription
+	local otherCivName = GetPlayerCivilizationName(otherPlayer)
 	local turn = Game.GetGameTurn()
 	local id = otherCivName .. "-" .. turn
 
@@ -49,4 +49,9 @@ function WarStateHandler( iTeam1, iTeam2, bWar )
 	else
 		SaveWarEnd(otherPlayer)
 	end
+end
+
+function GetPlayerCivilizationName(player)
+	local textKey = GameInfo.Civilizations[player:GetCivilizationType()].ShortDescription
+	return Locale.Lookup(textKey)
 end
