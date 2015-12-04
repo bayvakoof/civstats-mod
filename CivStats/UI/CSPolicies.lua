@@ -144,15 +144,17 @@ function SavePolicyData(policyInfo, turn)
 	polUserData.SetValue(id .. "-cost", cost)
 end
 
--- TODO Confirm this works
--- http://civilization.wikia.com/wiki/Mathematics_of_Civilization_V
+-- This kinda works, but values are sometimes off (e.g. expected: 15, actual: 11; exp: 70, actual: 74.5)
+-- See method 
+-- bool CvPlayerPolicies::CanAdoptPolicy(PolicyTypes eIndex, bool bIgnoreCost) const
+-- in CvPolicyClasses.cpp to improve
+-- Summary here too: http://civilization.wikia.com/wiki/Mathematics_of_Civilization_V 
 function CalculateLastPolicyCost()
 	local player = Players[Game.GetActivePlayer()]
 	local nextCost = player:GetNextPolicyCost()
-	local numPolicies = player:GetNumPolicies()
+	local numPolicies = player:GetNumPolicies() - player:GetNumFreePolicies()
 
-	local lastCost = nextCost * ( (25 + 6 * (numPolicies - 1) ^ 1.7) / 
-		(25 + 6 * numPolicies ^ 1.7) )
-	print("Last culture cost: " .. lastCost)
+	local lastCost = nextCost * ( math.floor(25 + (6 * (numPolicies - 1)) ^ 1.7) / 
+		math.floor(25 + (6 * numPolicies) ^ 1.7) )
 	return lastCost
 end
