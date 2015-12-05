@@ -26,7 +26,7 @@ function SaveNaturalWondersInCity(city)
 	for i = 0, city:GetNumCityPlots() - 1, 1 do
 		local plot = city:GetCityIndexPlot( i );
 		if plot ~= nil and FeatureIsWonder(plot:GetFeatureType()) then
-			SaveNaturalWonder(plot:GetFeatureType(), city)
+			SaveNaturalWonder(plot, plot:GetFeatureType(), city)
 		end
 	end
 end
@@ -40,15 +40,26 @@ function DeleteNaturalWondersInCity(city)
 	end
 end
 
-function SaveNaturalWonder(featureId, city)
+function SaveNaturalWonder(plot, featureId, city)
 	naturalUserData.SetValue(featureId, true)
 	local name = Locale.ConvertTextKey(GameInfo.Features[featureId].Description);
 	naturalUserData.SetValue(featureId .. "-name", name)
 	naturalUserData.SetValue(featureId .. "-turn", Game.GetGameTurn())
+	
+	local cityName = ""
+	local wasConquered = false
 
 	if city ~= nil then
-		naturalUserData.SetValue(featureId .. "-city", city:GetName())
+		cityName = city:GetName()
+		wasConquered = (city:GetOriginalOwner() ~= Game.GetActivePlayer())
 	end
+	
+	naturalUserData.SetValue(featureId .. "-city", cityName)
+	naturalUserData.SetValue(featureId .. "-conquered", wasConquered)
+
+	local capital = Players[Game.GetActivePlayer()]:GetCapitalCity()
+	local distance = Map.PlotDistance( plot:GetX(), plot:GetY(), capital:GetX(), capital:GetY() )	
+	naturalUserData.SetValue(featuredId .. "-distance", distance)
 end
 
 function DeleteNaturalWonder(featureId)
@@ -74,7 +85,7 @@ function HandleBorderExpansion(hexX, hexY, playerID, isUnknown)
 	if plot and FeatureIsWonder(plot:GetFeatureType()) then
 		-- Save the natural wonder
 		local city = plot:GetWorkingCity() -- doesnt work correctly for plots outside city working radius
-		SaveNaturalWonder(plot:GetFeatureType(), city)
+		SaveNaturalWonder(plot, plot:GetFeatureType(), city)
 	end
 end
 
