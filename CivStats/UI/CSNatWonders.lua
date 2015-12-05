@@ -59,7 +59,7 @@ function SaveNaturalWonder(plot, featureId, city)
 
 	local capital = Players[Game.GetActivePlayer()]:GetCapitalCity()
 	local distance = Map.PlotDistance( plot:GetX(), plot:GetY(), capital:GetX(), capital:GetY() )	
-	naturalUserData.SetValue(featuredId .. "-distance", distance)
+	naturalUserData.SetValue(featureId .. "-distance", distance)
 end
 
 function DeleteNaturalWonder(featureId)
