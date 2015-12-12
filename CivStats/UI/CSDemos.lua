@@ -14,8 +14,8 @@ local approvalTable = {}
 local literacyTable = {}
 
 function SetupDemographicsSaving()
-	Modding.DeleteUserData("civstats-demos", 1)
-	demosUserData = Modding.OpenUserData("civstats-demos", 1)
+	DeleteDB("demos")
+	demosUserData = OpenDB("demos")
 	Events.ActivePlayerTurnEnd.Add( SaveDemographicsData )
 end
 

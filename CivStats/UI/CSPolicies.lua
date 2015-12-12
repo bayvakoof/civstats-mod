@@ -5,9 +5,9 @@
 local polUserData = nil
 local currentIdeology = nil
 
-function SetupPolicyChoiceSaving()    
-	Modding.DeleteUserData("civstats-policies", 1)
-	polUserData = Modding.OpenUserData("civstats-policies", 1)
+function SetupPolicyChoiceSaving()  
+	DeleteDB("policies")
+	polUserData = OpenDB("policies")
 
 	GameEvents.PlayerAdoptPolicy.Add( HandlePlayerPolicyChoice )
 	GameEvents.PlayerAdoptPolicyBranch.Add( HandlePlayerBranchChoice )
@@ -148,7 +148,8 @@ end
 -- See method 
 -- bool CvPlayerPolicies::CanAdoptPolicy(PolicyTypes eIndex, bool bIgnoreCost) const
 -- in CvPolicyClasses.cpp to improve
--- Summary here too: http://civilization.wikia.com/wiki/Mathematics_of_Civilization_V 
+-- Summary here too: http://civilization.wikia.com/wiki/Mathematics_of_Civilization_V
+-- this is also inaccurate when taking a free policy (e.g. Oracle), TODO: cost should be 0 for free policies
 function CalculateLastPolicyCost()
 	local player = Players[Game.GetActivePlayer()]
 	local nextCost = player:GetNextPolicyCost()

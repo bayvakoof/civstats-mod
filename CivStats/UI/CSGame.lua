@@ -26,7 +26,8 @@ function SavePlayerInfo()
 	local iActivePlayer = Game.GetActivePlayer()
 
 	for iPlayerLoop = 0, GameDefines.MAX_MAJOR_CIVS-1, 1 do
-		if iPlayerLoop ~= iActivePlayer then
+		local player = Players[iPlayerLoop]
+		if iPlayerLoop ~= iActivePlayer and player:IsEverAlive() then
 			pOtherPlayer = Players[iPlayerLoop];
 			gameUserData.SetValue(iPlayerLoop .. "-name", pOtherPlayer:GetName())
 			gameUserData.SetValue(iPlayerLoop .. "-civ", GetCivilizationName(iPlayerLoop))

@@ -5,8 +5,8 @@
 local naturalUserData = nil
 
 function SetupNaturalWonderSaving()   
-	Modding.DeleteUserData("civstats-natural", 1)
-	naturalUserData = Modding.OpenUserData("civstats-natural", 1)
+	DeleteDB("natural")
+	naturalUserData = OpenDB("natural")
  
 	-- this is also triggered when players plant cities, so GameEvents.PlayerCityFounded is unnecessary
 	-- this is also triggered for each tile when players capture cities (for the capturing player)

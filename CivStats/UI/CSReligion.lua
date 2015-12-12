@@ -5,8 +5,8 @@
 local religUserData = nil
 
 function SetupReligionSaving()
-	Modding.DeleteUserData("civstats-religion", 1)
-	religUserData = Modding.OpenUserData("civstats-religion", 1)
+	DeleteDB("religion")
+	religUserData = OpenDB("religion")
 
 	-- immediately fired after founding a religion
 	GameEvents.CityConvertsReligion.Add( HandleCityReligiousConversion )

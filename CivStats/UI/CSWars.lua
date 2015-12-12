@@ -5,8 +5,8 @@
 local warUserData = nil
 
 function SetupWarSaving()  
-	Modding.DeleteUserData("civstats-wars", 1)
-	warUserData = Modding.OpenUserData("civstats-wars", 1)  
+	DeleteDB("wars")
+	warUserData = OpenDB("wars")
 	
 	Events.WarStateChanged.Add( WarStateHandler )
 end
@@ -44,7 +44,7 @@ function WarStateHandler( iTeam1, iTeam2, bWar )
 
 	local otherPlayer = Players[otherTeam:GetLeaderID()]
 	if bWar then
-		local isAggressor = (iTeam1 == Game.GetActiveTeam())
+		local isAggressor = (iTeam2 == Game.GetActiveTeam())
 		SaveWarStart(otherPlayer, isAggressor)
 	else
 		SaveWarEnd(otherPlayer)

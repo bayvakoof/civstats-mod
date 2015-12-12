@@ -5,8 +5,8 @@
 local wonderUserData = nil
 
 function SetupWonderSaving()   
-	Modding.DeleteUserData("civstats-wonders", 1)
-	wonderUserData = Modding.OpenUserData("civstats-wonders", 1)
+	DeleteDB("wonders")
+	wonderUserData = OpenDB("wonders")
 
 	-- singleplayer (also triggered when user clicks on notification in multiplayer)
 	Events.SerialEventGameMessagePopupShown.Add( HandleWonderPopup )
@@ -42,6 +42,12 @@ function DeleteWondersInCity(city)
 end
 
 function SaveWonder(wonderId, conquered)
+	if wonderUserData.GetValue(wonderId) == true then
+		return -- dont save if it already exists
+		-- (multiple saves always occur in single player because
+		-- both the notification and popup handler fire)
+	end
+
 	wonderUserData.SetValue(wonderId, true)
 	local name = Locale.Lookup(GameInfo.Buildings[ wonderId ].Description)
 	wonderUserData.SetValue(wonderId .. "-name", name)
