@@ -18,6 +18,7 @@ function SaveGameInfo()
 	gameUserData.SetValue("map", GetMapName())
 	gameUserData.SetValue("size", GetMapSize())
 	gameUserData.SetValue("civilization", GetCivilizationName(Game.GetActivePlayer()))
+	gameUserData.SetValue("loaded-turn", Game.GetGameTurn());
 
 	SavePlayerInfo()
 end

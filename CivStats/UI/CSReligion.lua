@@ -56,6 +56,7 @@ function SaveReligionData()
 				local beliefType = string.lower(GetBeliefType(belief))
 				religUserData.SetValue(i, Locale.Lookup(belief.ShortDescription))
 				religUserData.SetValue(i .. "-type", beliefType)
+				religUserData.SetValue(i .. "-turn", Game.GetGameTurn())
 			end
 		end
 	elseif (player:HasCreatedPantheon()) then
@@ -63,6 +64,7 @@ function SaveReligionData()
 		local belief = GameInfo.Beliefs[pantheonId]
 		religUserData.SetValue("1", Locale.Lookup(belief.ShortDescription))
 		religUserData.SetValue("1-type", "pantheon")
+		religUserData.SetValue("1-turn", Game.GetGameTurn())
 	end
 end
 
