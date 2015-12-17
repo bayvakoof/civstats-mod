@@ -9,7 +9,8 @@ Only tested with AllDLC and NQMod+AllDLC.
 Put the Civstats folder in your game's `Assets/DLC` directory.
 
 ## TODO
-- [ ] add `distance` and `captured` information for natural wonders (`distance` would be how many tiles from capital)
+- [x] add `distance` and `captured` information for natural wonders (`distance` would be how many tiles from capital)
 - [ ] add `culture`, `tourism`, and `faith` to demographics
 - [ ] consider adding more information on the game (pitboss/network multiplayer/hotseat multiplayer etc)
-- [ ] spy steals tracker? spies killed / successful tech steals (which techs)
+- [ ] consider spy steals tracker? spies killed / successful tech steals (which techs)
+- [ ] able to track whether wonders were engineered/hardbuilt?
